@@ -1,0 +1,23 @@
+RPi
+01   ->     VCC     (LHSMD)
+17   ->     VCC     (RHSMD)
+06   ->     GND     (LHSMD)
+09   ->     GND     (RHSMD)
+
+12   ->     PWMA    (LHSMD)
+18   ->     AN2     (LHSMD)
+16   ->     AN1     (LHSMD)
+22   ->     STBY    (LHSMD)
+15   ->     BN1     (LHSMD)
+13   ->     BN2     (LHSMD)
+11   ->     PWMB    (LHSMD)
+
+19   ->     PWMA    (RHSMD)
+21   ->     PWMB    (RHSMD)
+23   ->     AN2     (RHSMD) 
+24   ->     AN1     (RHSMD)
+36   ->     STBY    (RHSMD)
+29   ->     BN1     (RHSMD)
+27   ->     BN2     (RHSMD)
+
+
