@@ -7,7 +7,7 @@ GPIO.setwarnings(False);
 # PWM Frequency
 pwmFreq = 100
 
-# Setup Pins for motor controller
+# Setup Pins for motor controller - LHS
 GPIO.setup(12, GPIO.OUT)    # PWMA
 GPIO.setup(18, GPIO.OUT)    # AIN2
 GPIO.setup(16, GPIO.OUT)    # AIN1
@@ -16,10 +16,24 @@ GPIO.setup(15, GPIO.OUT)    # BIN1
 GPIO.setup(13, GPIO.OUT)    # BIN2
 GPIO.setup(11, GPIO.OUT)    # PWMB
 
-pwma = GPIO.PWM(12, pwmFreq)    # pin 18 to PWM  
-pwmb = GPIO.PWM(11, pwmFreq)    # pin 13 to PWM
-pwma.start(100)
-pwmb.start(100)
+# Setup Pins for motor controller - RHS
+GPIO.setup(19, GPIO.OUT)    # PWMA
+GPIO.setup(23, GPIO.OUT)    # AIN2
+GPIO.setup(24, GPIO.OUT)    # AIN1
+GPIO.setup(36, GPIO.OUT)    # STBY
+GPIO.setup(29, GPIO.OUT)    # BIN1
+GPIO.setup(27, GPIO.OUT)    # BIN2
+GPIO.setup(21, GPIO.OUT)    # PWMB
+
+pwma_lhs = GPIO.PWM(12, pwmFreq)    # pin 18 to PWM  
+pwmb_lhs = GPIO.PWM(11, pwmFreq)    # pin 13 to PWM
+pwma_lhs.start(100)
+pwmb_lhs.start(100)
+
+pwma_rhs = GPIO.PWM(19, pwmFreq)    # pin 23 to PWM  
+pwmb_rhs = GPIO.PWM(21, pwmFreq)    # pin 27 to PWM
+pwma_rhs.start(100)
+pwmb_rhs.start(100)
 
 ## Functions
 ###############################################################################
@@ -51,15 +65,16 @@ def runMotor(motor, spd, direction):
     if(motor == 0):
         GPIO.output(16, in1)
         GPIO.output(18, in2)
-        pwma.ChangeDutyCycle(spd)
+        pwma_lhs.ChangeDutyCycle(spd)
     elif(motor == 1):
         GPIO.output(15, in1)
         GPIO.output(13, in2)
-        pwmb.ChangeDutyCycle(spd)
+        pwmb_lhs.ChangeDutyCycle(spd)
 
 
 def motorStop():
     GPIO.output(22, GPIO.LOW)
+    GPIO.output(36, GPIO.LOW)
 
 ## Main
 ##############################################################################
