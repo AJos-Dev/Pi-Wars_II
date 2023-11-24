@@ -22,7 +22,7 @@ GPIO.setup(23, GPIO.OUT)    # AIN2
 GPIO.setup(24, GPIO.OUT)    # AIN1
 GPIO.setup(36, GPIO.OUT)    # STBY
 GPIO.setup(29, GPIO.OUT)    # BIN1
-GPIO.setup(27, GPIO.OUT)    # BIN2
+GPIO.setup(37, GPIO.OUT)    # BIN2
 GPIO.setup(21, GPIO.OUT)    # PWMB
 
 pwma_lhs = GPIO.PWM(12, pwmFreq)    # pin 18 to PWM  
@@ -37,68 +37,106 @@ pwmb_rhs.start(100)
 
 ## Functions
 ###############################################################################
-def forward(spd):
+
+def forward(spd, duration):
     runMotor(0, spd, 0)
     runMotor(1, spd, 0)
+    runMotor(2, spd, 0)
+    runMotor(3, spd, 0)
+    sleep(duration)
+    motorStop()
 
-def reverse(spd):
+def reverse(spd, duration):
     runMotor(0, spd, 1)
     runMotor(1, spd, 1)
+    runMotor(2, spd, 1)
+    runMotor(3, spd, 1)
+    sleep(duration)
+    motorStop()
 
-def turnLeft(spd):
-    runMotor(0, spd, 0)
-    runMotor(1, spd, 1)
-
-def turnRight(spd):
+def left(spd, duration):
     runMotor(0, spd, 1)
     runMotor(1, spd, 0)
+    runMotor(2, spd, 0)
+    runMotor(3, spd, 1)
+    sleep(duration)
+    motorStop()
+    
+def right(spd, duration):
+    runMotor(0, spd, 0)
+    runMotor(1, spd, 1)
+    runMotor(2, spd, 1)
+    runMotor(3, spd, 0)
+    sleep(duration)
+    motorStop()
+
+def forward_left(spd, duration):
+    runMotor(1, spd, 0)
+    runMotor(2, spd, 0)
+    sleep(duration)
+    motorStop()
+
+def forward_right(spd, duration):
+    runMotor(0, spd, 0)
+    runMotor(3, spd, 0)
+    sleep(duration)
+    motorStop()
+
+def backward_left(spd, duration):
+    runMotor(0, spd, 1)
+    runMotor(3, spd, 1)
+    sleep(duration)
+    motorStop()
+
+def backward_right(spd, duration):
+    runMotor(1, spd, 1)
+    runMotor(2, spd, 0)
+    sleep(duration)
+    motorStop()
+
+def rotate_left(spd, duration):
+    runMotor(0, spd, 1)
+    runMotor(1, spd, 0)
+    runMotor(2, spd, 1)
+    runMotor(3, spd, 0)
+    sleep(duration)
+    motorStop()
+
+def rotate_right(spd, duration):
+    runMotor(0, spd, 0)
+    runMotor(1, spd, 1)
+    runMotor(2, spd, 0)
+    runMotor(3, spd, 1)
+    sleep(duration)
+    motorStop()
 
 def runMotor(motor, spd, direction):
-    GPIO.output(22, GPIO.HIGH);
+    GPIO.output(22, GPIO.HIGH)
+    GPIO.output(36, GPIO.HIGH)
     in1 = GPIO.HIGH
     in2 = GPIO.LOW
 
-    if(direction == 1):
+    if direction == 1:
         in1 = GPIO.LOW
         in2 = GPIO.HIGH
 
-    if(motor == 0):
+    if motor == 0:
         GPIO.output(16, in1)
         GPIO.output(18, in2)
         pwma_lhs.ChangeDutyCycle(spd)
-    elif(motor == 1):
+    elif motor == 1:
+        GPIO.output(24, in1)
+        GPIO.output(23, in2)
+        pwma_rhs.ChangeDutyCycle(spd)
+    elif motor == 2:
         GPIO.output(15, in1)
         GPIO.output(13, in2)
         pwmb_lhs.ChangeDutyCycle(spd)
-
+    elif motor == 3:
+        GPIO.output(29, in1)
+        GPIO.output(37, in2)
+        pwmb_rhs
 
 def motorStop():
     GPIO.output(22, GPIO.LOW)
     GPIO.output(36, GPIO.LOW)
-
-## Main
-##############################################################################
-def main(args=None):
-    while True:
-        forward(50)     # run motor forward
-        sleep(2)        # ... for 2 seconds
-        motorStop()     # ... stop motor
-        sleep(.25)      # delay between motor runs
-
-        reverse(50)     # run motor in reverse
-        sleep(2)        # ... for 2 seoconds
-        motorStop()     # ... stop motor
-        sleep(.25)      # delay between motor runs
-
-        turnLeft(50)    # turn Left
-        sleep(2)        # ... for 2 seconds
-        motorStop()     # ... stop motors
-        sleep(.25)      # delay between motor runs
-
-        turnRight(50)   # turn Right
-        sleep(2)        # ... for 2 seconds
-        motorStop()     # ... stop motors
-        sleep(2)        # delay between motor runs
-
-if __name__ == "__main__":
-    main()
