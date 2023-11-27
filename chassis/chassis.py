@@ -2,7 +2,7 @@ from time import sleep
 import RPi.GPIO as GPIO
 
 GPIO.setmode(GPIO.BOARD)      # Set GPIO mode to BCM
-GPIO.setwarnings(False);
+GPIO.setwarnings(False)
 
 # PWM Frequency
 pwmFreq = 100
@@ -135,8 +135,20 @@ def runMotor(motor, spd, direction):
     elif motor == 3:
         GPIO.output(29, in1)
         GPIO.output(37, in2)
-        pwmb_rhs
+        pwmb_rhs.ChangeDutyCycle(spd)
 
 def motorStop():
     GPIO.output(22, GPIO.LOW)
     GPIO.output(36, GPIO.LOW)
+
+    GPIO.output(16, GPIO.LOW)
+    GPIO.output(18, GPIO.LOW)
+
+    GPIO.output(24, GPIO.LOW)
+    GPIO.output(23, GPIO.LOW)
+
+    GPIO.output(15, GPIO.LOW)
+    GPIO.output(13, GPIO.LOW)
+
+    GPIO.output(29, GPIO.LOW)
+    GPIO.output(37, GPIO.LOW)
