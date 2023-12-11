@@ -5,3 +5,5 @@
 *.FCStd2
 *.FCBak
 Private
+
+build/
