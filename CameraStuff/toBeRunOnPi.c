@@ -50,8 +50,8 @@ int sendBuffer(int socket_fd, const uint32_t *buffer, size_t buffer_size) {
 }
 
 int main() {
-  uint32_t data[720 * 480];
-  for (int i = 0; i < 720 * 480; i++) {
+  uint32_t data[720];
+  for (int i = 0; i < 720; i++) {
     data[i] = 0xff0000ff;
   }
   int server_socket, new_socket;
@@ -96,10 +96,10 @@ int main() {
   printf("Connection accepted from %s:%d\n", inet_ntoa(client_addr.sin_addr),
          ntohs(client_addr.sin_port));
 
-  uint32_t *buffer = create_buffer_from_data(data, 1, 3, 720 * 480);
+  uint32_t *buffer = create_buffer_from_data(data, 1, 3, 720);
 
   // Send buffer
-  if (sendBuffer(new_socket, buffer, buffer[2]) == 0) {
+  if (sendBuffer(new_socket, buffer, buffer[2] + buffer[0]) == 0) {
     printf("Buffer sent successfully!\n");
   } else {
     printf("Failed to send buffer.\n");

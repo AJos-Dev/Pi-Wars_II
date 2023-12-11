@@ -73,7 +73,7 @@ uint32_t *readBufferFromSocket(int socket_fd) {
 
   // Read the rest of the buffer
   bytes_received =
-      recv(socket_fd, buffer + 3, (buffer_size - 3) * sizeof(uint32_t), 0);
+      recv(socket_fd, buffer + 3 * 4, (buffer_size - 3) * sizeof(uint32_t), 0);
 
   if (bytes_received == -1) {
     perror("Error while receiving data");
@@ -86,6 +86,23 @@ uint32_t *readBufferFromSocket(int socket_fd) {
             bytes_received);
     free(buffer);
     return NULL;
+  } // Send buffer over a socket
+  int sendBuffer(int socket_fd, const uint32_t *buffer, size_t buffer_size) {
+    ssize_t bytes_sent =
+        send(socket_fd, buffer, buffer_size * sizeof(uint32_t), 0);
+
+    if (bytes_sent == -1) {
+      perror("Error while sending data");
+      return -1;
+    }
+
+    if (bytes_sent != buffer_size * sizeof(uint32_t)) {
+      fprintf(stderr, "Incomplete send. Sent %zd bytes out of %zu.\n",
+              bytes_sent, buffer_size * sizeof(uint32_t));
+      return -1;
+    }
+
+    return 0; // Success
   }
 
   return buffer;
@@ -130,12 +147,13 @@ int main() {
     for (size_t i = 0; i < received_buffer[2]; i++) {
       printf("received_buffer[%zu] = %u\n", i, received_buffer[i]);
     }
+    printf("Hi\n");
 
     // Free the received buffer
-    free(received_buffer);
   } else {
     printf("Failed to receive buffer from the server.\n");
   }
+  free(received_buffer);
 
   // Close client socket
   close(client_socket);
