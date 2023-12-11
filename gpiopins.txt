@@ -18,6 +18,6 @@ RPi
 24   ->     AIN1     (RHSMD)
 36   ->     STBY    (RHSMD)
 29   ->     BIN1     (RHSMD)
-27   ->     BIN2     (RHSMD)
+37   ->     BIN2     (RHSMD)
 
 
