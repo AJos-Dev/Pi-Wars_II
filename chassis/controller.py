@@ -1,6 +1,7 @@
 import evdev
 from evdev import ecodes
-import chassis
+
+# import chassis
 
 
 device = evdev.InputDevice("/dev/input/event13")
@@ -13,6 +14,8 @@ print(device)
 for event in device.read_loop():
     if event.type == evdev.ecodes.EV_KEY:
         if event.code == ecodes.ecodes["BTN_TR2"] and event.value == 1:
-            chassis.forward(50)
+            print("TR2 DOWN")
+            # chassis.forward(50)
         if event.code == ecodes.ecodes["BTN_TR2"] and event.value == 0:
-            chassis.motorStop()
+            print("TR2 UP")
+            # chassis.motorStop()
