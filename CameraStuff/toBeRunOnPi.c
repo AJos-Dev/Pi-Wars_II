@@ -30,24 +30,16 @@ uint32_t *create_buffer_from_data(const uint32_t *data, size_t stride,
   return buffer;
 }
 
+// Send buffer over a socket
 int sendBuffer(int socket_fd, const uint32_t *buffer, size_t buffer_size) {
-  // Check for a valid socket file descriptor
-  if (socket_fd < 0) {
-    perror("Invalid socket file descriptor");
-    return -1;
-  }
-
-  // Attempt to send the buffer over the socket
   ssize_t bytes_sent =
       send(socket_fd, buffer, buffer_size * sizeof(uint32_t), 0);
 
-  // Check for errors during the send operation
   if (bytes_sent == -1) {
     perror("Error while sending data");
     return -1;
   }
 
-  // Check if all bytes were sent
   if (bytes_sent != buffer_size * sizeof(uint32_t)) {
     fprintf(stderr, "Incomplete send. Sent %zd bytes out of %zu.\n", bytes_sent,
             buffer_size * sizeof(uint32_t));

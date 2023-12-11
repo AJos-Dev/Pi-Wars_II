@@ -81,7 +81,7 @@ uint32_t *readBufferFromSocket(int socket_fd) {
     return NULL;
   }
 
-  if (bytes_received != (buffer_size) * sizeof(uint32_t)) {
+  if (bytes_received != (buffer_size - 3) * sizeof(uint32_t)) {
     fprintf(stderr, "Incomplete buffer received. Received %zd bytes.\n",
             bytes_received);
     free(buffer);
