@@ -8,7 +8,6 @@
 #include <unistd.h>
 
 #define PORT 8080
-#define IP "192.168.1.24"
 
 // TODO: Confirm memoru allocation is correct, especially for the for loop.
 
@@ -58,31 +57,70 @@ int sendBuffer(int socket_fd, const uint32_t *buffer, size_t buffer_size) {
   return 0; // Success
 }
 
-int main(int argc, char *argv[]) {
+int main() {
   uint32_t data[720 * 480];
   for (int i = 0; i < 720 * 480; i++) {
     data[i] = 0xff0000ff;
   }
+  int server_socket, new_socket;
+  struct sockaddr_in server_addr, client_addr;
+  socklen_t addr_size = sizeof(struct sockaddr_in);
+
+  // Create socket
+  server_socket = socket(AF_INET, SOCK_STREAM, 0);
+  if (server_socket == -1) {
+    perror("Socket creation failed");
+    exit(EXIT_FAILURE);
+  }
+
+  // Set up server address struct
+  server_addr.sin_family = AF_INET;
+  server_addr.sin_port = htons(PORT);
+  server_addr.sin_addr.s_addr = INADDR_ANY;
+
+  // Bind the socket
+  if (bind(server_socket, (struct sockaddr *)&server_addr,
+           sizeof(server_addr)) == -1) {
+    perror("Binding failed");
+    exit(EXIT_FAILURE);
+  }
+
+  // Listen for incoming connections
+  if (listen(server_socket, 10) == -1) {
+    perror("Listening failed");
+    exit(EXIT_FAILURE);
+  }
+
+  printf("Server listening on port %d...\n", PORT);
+
+  // Accept a connection
+  new_socket =
+      accept(server_socket, (struct sockaddr *)&client_addr, &addr_size);
+  if (new_socket == -1) {
+    perror("Acceptance failed");
+    exit(EXIT_FAILURE);
+  }
+
+  printf("Connection accepted from %s:%d\n", inet_ntoa(client_addr.sin_addr),
+         ntohs(client_addr.sin_port));
 
   uint32_t *buffer = create_buffer_from_data(data, 1, 3, 720 * 480);
 
-  int opt = 1;
-  int socket_fd = socket(AF_INET, SOCK_STREAM, 0);
-  setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt,
-             sizeof(opt));
-
-  struct sockaddr_in address;
-  address.sin_family = AF_INET;
-  address.sin_port = htons(PORT);
-  address.sin_addr.s_addr = inet_addr(IP);
-
-  if (connect(socket_fd, (struct sockaddr *)&address, sizeof(address)) < 0) {
-    perror("Connection failed");
-    return -1;
+  // Send buffer
+  if (sendBuffer(new_socket, buffer, buffer[2]) == 0) {
+    printf("Buffer sent successfully!\n");
+  } else {
+    printf("Failed to send buffer.\n");
   }
 
-  sendBuffer(socket_fd, buffer, 720 * 480 + (3 * 4));
+  // Close new socket
+  close(new_socket);
 
+  // Close server socket
+  close(server_socket);
+
+  // Free buffer memory
   free(buffer);
+
   return 0;
 }

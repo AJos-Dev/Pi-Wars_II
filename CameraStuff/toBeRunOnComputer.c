@@ -72,8 +72,8 @@ uint32_t *readBufferFromSocket(int socket_fd) {
   memcpy(buffer, header, sizeof(header));
 
   // Read the rest of the buffer
-  bytes_received = recv(socket_fd, buffer + sizeof(header) / sizeof(uint32_t),
-                        (buffer_size - 3) * sizeof(uint32_t), 0);
+  bytes_received =
+      recv(socket_fd, buffer + 3, (buffer_size - 3) * sizeof(uint32_t), 0);
 
   if (bytes_received == -1) {
     perror("Error while receiving data");
@@ -81,7 +81,7 @@ uint32_t *readBufferFromSocket(int socket_fd) {
     return NULL;
   }
 
-  if (bytes_received != (buffer_size - 3) * sizeof(uint32_t)) {
+  if (bytes_received != (buffer_size) * sizeof(uint32_t)) {
     fprintf(stderr, "Incomplete buffer received. Received %zd bytes.\n",
             bytes_received);
     free(buffer);
@@ -93,36 +93,52 @@ uint32_t *readBufferFromSocket(int socket_fd) {
 
 void send_buffer(uint32_t *buffer) {}
 
+#define PORT 8080
+#define SERVER_IP "127.0.0.1"
+
 int main() {
+  int client_socket;
+  struct sockaddr_in server_addr;
 
-  int socket_fd = socket(AF_INET, SOCK_STREAM, 0);
-  int opt = 1;
-  setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt,
-             sizeof(opt));
-
-  // we are listening on port 8080
-  struct sockaddr_in address;
-  address.sin_family = AF_INET;
-  address.sin_port = htons(8080);
-  address.sin_addr.s_addr = INADDR_ANY;
-
-  if (bind(socket_fd, (struct sockaddr *)&address, sizeof(address))) {
-    perror("Error while binding");
+  // Create socket
+  client_socket = socket(AF_INET, SOCK_STREAM, 0);
+  if (client_socket == -1) {
+    perror("Socket creation failed");
     exit(EXIT_FAILURE);
   }
-  listen(socket_fd, 3);
 
-  uint32_t *buffer = readBufferFromSocket(socket_fd);
+  // Set up server address struct
+  server_addr.sin_family = AF_INET;
+  server_addr.sin_port = htons(PORT);
+  inet_aton(SERVER_IP, &server_addr.sin_addr);
 
-  uint32_t *data = readBuffer(buffer);
-
-  // print the data
-  //
-  for (int i = 0; i < 10; i++) {
-    printf("%d\n", data[i]);
+  // Connect to the server
+  if (connect(client_socket, (struct sockaddr *)&server_addr,
+              sizeof(server_addr)) == -1) {
+    perror("Connection failed");
+    close(client_socket); // Close the socket on connection failure
+    exit(EXIT_FAILURE);
   }
 
-  free(buffer);
-  free(data);
+  printf("Connected to server %s:%d\n", SERVER_IP, PORT);
+
+  // Example buffer for receiving data
+  uint32_t *received_buffer = readBufferFromSocket(client_socket);
+
+  if (received_buffer != NULL) {
+    // Process the received buffer (replace with your logic)
+    for (size_t i = 0; i < received_buffer[2]; i++) {
+      printf("received_buffer[%zu] = %u\n", i, received_buffer[i]);
+    }
+
+    // Free the received buffer
+    free(received_buffer);
+  } else {
+    printf("Failed to receive buffer from the server.\n");
+  }
+
+  // Close client socket
+  close(client_socket);
+
   return 0;
 }
