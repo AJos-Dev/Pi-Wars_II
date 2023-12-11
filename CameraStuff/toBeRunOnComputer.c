@@ -106,7 +106,10 @@ int main() {
   address.sin_port = htons(8080);
   address.sin_addr.s_addr = INADDR_ANY;
 
-  bind(socket_fd, (struct sockaddr *)&address, sizeof(address));
+  if (bind(socket_fd, (struct sockaddr *)&address, sizeof(address))) {
+    perror("Error while binding");
+    exit(EXIT_FAILURE);
+  }
   listen(socket_fd, 3);
 
   uint32_t *buffer = readBufferFromSocket(socket_fd);

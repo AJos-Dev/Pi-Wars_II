@@ -8,7 +8,7 @@
 #include <unistd.h>
 
 #define PORT 8080
-#define IP "192.168.1.34"
+#define IP "192.168.1.24"
 
 // TODO: Confirm memoru allocation is correct, especially for the for loop.
 
